@@ -6,6 +6,95 @@
 
     <body>
         {% block mycontent %}
+        <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+    
+        <script>
+            var amount= 2000
+         function initPayPalButton() {
+            document.getElementById("paypapl").style.visibility ="hidden";
+    paypal.Buttons({
+    
+      style: {
+    
+        shape: 'rect',
+    
+        color: 'gold',
+    
+        layout: 'vertical',
+    
+        label: 'paypal',
+    
+       
+    
+      },
+    
+    
+    
+      createOrder: function(data, actions) {
+    
+        return actions.order.create({
+    
+          purchase_units: [{"amount":{"currency_code":"USD","value":amount}}]
+    
+        });
+    
+      },
+    
+    
+    
+      onApprove: function(data, actions) {
+    
+        return actions.order.capture().then(function(orderData) {
+    
+         console.log(orderData)
+    
+          // Full available details
+    
+          console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+    
+    
+          
+    
+          // Show a success message within this page, e.g.
+    
+          const element = document.getElementById('paypal-button-container');
+    
+          element.innerHTML = '';
+    
+          element.innerHTML = '<h3>Thank you for your payment!</h3>'+orderData['id'];
+          var data = orderData['id']
+          const dsubmit = document.getElementById('oid');
+          dsubmit.value = data;
+    
+    
+        //  document.getElementById("datasubmit").form.submit();
+    
+           window.location.href='http://localhost:8000/payments/'+data
+    
+         
+    
+    
+         
+    
+        });
+    
+      },
+    
+    
+    
+      onError: function(err) {
+    
+        console.log(err);
+    
+      }
+    
+    }).render('#paypal-button-container');
+    
+    }
+    
+    
+    
+    </script>
         
             <div class="row px-md-4 px-2 pt-4">
                 <div class="col-lg-8">
@@ -45,22 +134,25 @@
                         <div class="card px-md-3 px-2 pt-4">
                         <div class="unregistered mb-4"><span class="py-1">Address</span></div>
                         <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="Name"> 
-                        </div>
+                        </div></br>
 
                         <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="Address"> 
-                        </div>
+                        </div></br>
 
                         <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="City"> 
-                        </div>
+                        </div></br>
 
                         <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="State"> 
-                        </div>
+                        </div></br>
 
                         <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="Pincode"> 
-                        </div>
+                        </div></br>
 
                         <div class="sale my-3"> <span>sale<span class="px-1">expiring</span><span>in</span>:</span><span class="red">21<span class="ps-1">hours</span>,31<span class="ps-1 ">minutes</span></span> </div>
                     </div>
+                    <button onclick="initPayPalButton()" name="paypapl" id="paypapl">Do Payment</button>
+                        
+                        <div class="sale my-3"> <div id="paypal-button-container"></div> </div>
                 </div>
                 
                         </div>
