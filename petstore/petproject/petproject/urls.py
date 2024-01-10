@@ -32,7 +32,9 @@ urlpatterns = [
     path('addtocart/',views.addtocart,name="atc"),
     path('viewcart/',views.viewcart,name="vc"),
     path('changequantity/',views.changequantity,name="cq"),
-    path('summary/',views.summarypage,name="summary")
+    path('summary/',views.summarypage,name="summary"),
+    path('payment/',views.payment,name="payment"),
+    path('placeorder/',views.placeholder,name="placeorder")
 ]
 
 if settings.DEBUG:

@@ -1,9 +1,10 @@
 from django.shortcuts import render,redirect
 from django.views.generic import ListView,DetailView
-from .models import pet,customer,cart
+from .models import pet,customer,cart,order,orderdetail
 from django.db.models import Q
 from django.http import HttpResponse
 from django.contrib.auth.hashers import make_password,check_password
+from datetime import date
 # Create your views here.
 class PetListView(ListView):
     model = pet
@@ -38,7 +39,7 @@ def registeration(request):
     if request.method == "GET":
         return render(request,"registration.html")
     elif request.method=="POST":
-        fn=request.POST.get("fn")
+        fn=request.POST.get("fn") # left side attribute and right side variable database fetch
         ln=request.POST.get("ln")
         email=request.POST.get("email")
         phoneno=request.POST.get("phone")
@@ -60,6 +61,7 @@ def login(request):
             flag = check_password(passfe,custobj.password) #nonencrypted password 1st argument custobj database mai se fetch krte hai oh 2nd argument that is encrypted password
           
             if flag:
+                
                 request.session['username']=request.POST.get("email")#session kb create hoga jb flag ki username password correct hogi tb
                 session= request.session['username']
 
@@ -124,3 +126,40 @@ def summarypage(request):
         totalbill=i.totalamount+totalbill
     print(type(cartobj))
     return render(request,"summary.html",{'session':customerobj.firstname,'petobj':cartobj,'totalbill':totalbill})
+
+def payment(request):
+    return render(request,"payment.html")
+
+def placeholder(request):
+    usersession = request.session['username']
+    customerobj = customer.objects.get(email=usersession)
+    name = request.POST.get('name') # left side name is attribute and right side variable database fetch
+    address = request.POST.get('address')
+    phoneno = int(request.POST.get('phoneno'))
+    city = request.POST.get('city')
+    state = request.POST.get('state')
+    pincode = int(request.POST.get('pincode'))
+    totalbillamount= float(request.POST.get('totalbillamount'))
+
+    orderobj = order(name=name,address = address,phoneno=phoneno,city=city,state=state,pincode=pincode,totalbillamount=totalbillamount )
+    orderobj.save()
+
+    dateobj = date.today()
+    print(dateobj)
+    datedata = str(dateobj).replace('-','') #date datatype hai date type is converted to string format use str .replace - part replace with no character
+    orderno =str(orderobj.id) + datedata #combiniation of id or date to generate order number
+    orderobj.ordernumber = orderno
+    orderobj.save()
+    cartobj = cart.objects.filter(customerid = customerobj.id)
+    
+    for i in cartobj: # cartobj is a set of records to iterate each and every record, i in cartobj to fetch first record cartobj
+        orderdetailobj = orderdetail(ordernumber = orderno, productid = i.productid,customerid=i.customerid,quantity=i.quantity,totalprice=i.totalamount)
+        orderdetailobj.save()
+        i.delete()
+
+
+
+    return render(request,'payment.html',{'orderobj':orderobj})
+
+
+

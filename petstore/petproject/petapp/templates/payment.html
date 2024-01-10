@@ -100,7 +100,7 @@
                 <div class="col-lg-8">
                     <p class="pb-2 fw-bold">Order</p>
                     <div class="card">
-                        <div class="ribbon ribbon-top-right"><span>Product In your Cart</span></div>
+                        <div class="ribbon ribbon-top-right"><span>Order Summary</span></div>
                         <div>
                             <div class="table-responsive px-md-4 px-2 pt-3">
                                 <table class="table table-borderless">
@@ -127,35 +127,18 @@
                 <div class="col-lg-4 payment-summary">
                     <p class="fw-bold pt-lg-0 pt-4 pb-2">Payment Summary</p>
                     <div class="card px-md-3 px-2 pt-4">
-                    <form method="POST" action="{% url 'placeorder'%}">
-                        {% csrf_token %}
+                       
+
                         <div class="unregistered mb-4"><span class="py-1">Total Bill: {{totalbill}} Rs. </span> </div>
                        
                         <div class="card px-md-3 px-2 pt-4">
                         <div class="unregistered mb-4"><span class="py-1">Address</span></div>
-                        <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="Name" name="name"> 
-                        </div></br>
                         
-                        <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="Phoneno" name="phoneno"> 
-                        </div></br>
 
-                        <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="Address" name="address"> 
-                        </div></br>
-
-                        <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="City" name="city"> 
-                        </div></br>
-
-                        <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="State" name="state"> 
-                        </div></br>
-
-                        <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="Pincode" name="pincode"> 
-                        </div></br><input type="hidden" name= "totalbillamount" value= "{{totalbill}}"> 
-                        <button input="submit" name="Submit">Add Address and Place Order</button>
-
-                    </form>
-
+                        <div class="sale my-3">Sakshi Kulade Panvel Navi Mumbai</div>
                     </div>
-                   
+                    <button onclick="initPayPalButton()" name="paypapl" id="paypapl">Do Payment</button>
+                        
                         <div class="sale my-3"> <div id="paypal-button-container"></div> </div>
                 </div>
                 
