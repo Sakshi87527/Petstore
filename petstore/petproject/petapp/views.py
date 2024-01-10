@@ -12,8 +12,10 @@ class PetListView(ListView):
 
     def get_context_data(self,**kwargs):
         data = self.request.session['username']
+        obj = customer.objects.get(email=data)
         context = super().get_context_data(**kwargs)
-        context['session'] = data
+        context['session'] = obj.firstname
+
         return context
 
 
@@ -60,6 +62,7 @@ def login(request):
             if flag:
                 request.session['username']=request.POST.get("email")#session kb create hoga jb flag ki username password correct hogi tb
                 session= request.session['username']
+
                 return redirect('../petlist/')
                 #return render(request,"petlist.html",{'session':session })
                
@@ -73,10 +76,10 @@ def addtocart(request):
     productid = request.POST['pid']
     pobj = pet.pets.get(id=productid)
     usersession = request.session['username']
-    cobj = customer.objects.get(email = usersession)
-    flag = cart.objects.filter(customerid = cobj.id,productid=pobj.id)
+    cobj = customer.objects.get(email = usersession)# get method single record fetch
+    flag = cart.objects.filter(customerid = cobj.id,productid=pobj.id) # multiple record fetch
     if flag:
-        cartobj = cart(quantity=1,totalamount=pobj.price,customerid=cobj,productid=pobj)
+        cartobj=cart.objects.get(customerid=cobj.id,productid=pobj.id)
         cartobj.quantity = cartobj.quantity+1
         cartobj.totalamount = cartobj.quantity*pobj.price
         cartobj.save()
@@ -84,13 +87,13 @@ def addtocart(request):
         cartobj = cart(quantity=1,totalamount=pobj.price,customerid=cobj,productid=pobj)
         cartobj.save()
     cartobjdisplay = cart.objects.filter(customerid = cobj.id)
-    return render(request,"cart.html", {'session':usersession,'petobj':cartobjdisplay})
+    return render(request,"cart.html", {'session':cobj.firstname,'petobj':cartobjdisplay})
 
 def viewcart(request):
     usersession = request.session['username']
     customerobj =  customer.objects.get(email=usersession)
     cartobj = cart.objects.filter(customerid = customerobj.id)
-    return render(request,'cart.html',{'petobj':cartobj,'session':'usersession'})
+    return render(request,'cart.html',{'petobj':cartobj,'session':customerobj.firstname})
 
 def changequantity(request):
     usersession = request.session['username']
@@ -107,8 +110,10 @@ def changequantity(request):
         cartobj.quantity = cartobj.quantity-1
         cartobj.totalamount= cartobj.quantity*cartobj.productid.price
         cartobj.save()
+        if cartobj.quantity==0:
+            cartobj.delete()
     cartobj = cart.objects.filter(customerid = customerobj.id)
-    return render(request,'cart.html',{'petobj':cartobj,'session':usersession})
+    return render(request,'cart.html',{'petobj':cartobj,'session':customerobj.firstname})
 
 def summarypage(request):
     usersession = request.session['username']
@@ -118,4 +123,4 @@ def summarypage(request):
     for i in cartobj:
         totalbill=i.totalamount+totalbill
     print(type(cartobj))
-    return render(request,"summary.html",{'session':usersession,'petobj':cartobj,'totalbill':totalbill})
+    return render(request,"summary.html",{'session':customerobj.firstname,'petobj':cartobj,'totalbill':totalbill})
