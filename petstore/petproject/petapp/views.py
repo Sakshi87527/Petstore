@@ -39,7 +39,7 @@ def registeration(request):
     if request.method == "GET":
         return render(request,"registration.html")
     elif request.method=="POST":
-        fn=request.POST.get("fn") # left side attribute and right side variable database fetch
+        fn=request.POST.get("fn") # left side attribute and right side variable jo html page pe diye input type database fetch
         ln=request.POST.get("ln")
         email=request.POST.get("email")
         phoneno=request.POST.get("phone")
@@ -125,12 +125,12 @@ def summarypage(request):
     for i in cartobj:
         totalbill=i.totalamount+totalbill
     print(type(cartobj))
-    return render(request,"summary.html",{'session':customerobj.firstname,'petobj':cartobj,'totalbill':totalbill})
+    return render(request,"summary.html",{'session':customerobj.firstname,'cartobj':cartobj,'totalbill':totalbill})
 
 def payment(request):
     return render(request,"payment.html")
 
-def placeholder(request):
+def placeolder(request):
     usersession = request.session['username']
     customerobj = customer.objects.get(email=usersession)
     name = request.POST.get('name') # left side name is attribute and right side variable database fetch
@@ -152,14 +152,36 @@ def placeholder(request):
     orderobj.save()
     cartobj = cart.objects.filter(customerid = customerobj.id)
     
-    for i in cartobj: # cartobj is a set of records to iterate each and every record, i in cartobj to fetch first record cartobj
-        orderdetailobj = orderdetail(ordernumber = orderno, productid = i.productid,customerid=i.customerid,quantity=i.quantity,totalprice=i.totalamount)
+    #for i in cartobj: # cartobj is a set of records to iterate each and every record, i in cartobj to fetch first record cartobj
+        #orderdetailobj = orderdetail(ordernumber = orderno, productid = i.productid,customerid=i.customerid,quantity=i.quantity,totalprice=i.totalamount)
+       # orderdetailobj.save()
+        #i.delete()
+    totalbill=0
+    for i in cartobj:
+        totalbill=i.totalamount+totalbill
+    return render(request,'payment.html',{'orderobj':orderobj,'cartobj':cartobj,'totalbill':totalbill,'session':usersession})
+
+def logout(request):
+    request.session['username']=''
+    # del(request.session['username'] )
+    return redirect('../login/')
+
+def paymentsuccess(request,tid,orderid):
+    print(tid)
+    usersession = request.session['username']
+    customerobj = customer.objects.get(email=usersession)
+    cartobj = cart.objects.filter(customerid = customerobj.id)
+
+    orderobj = order.objects.get(ordernumber = orderid)
+    paymentobj = payment(transactionid = tid, paymentstatus='paid',customerid=customerobj,oid = orderobj)
+    paymentobj.save()
+    for i in cartobj:
+        orderdetailobj = orderdetail(paymentid = paymentobj,ordernumber = orderid, productid = i.productid,customerid = i.customerid,quantity = i.quantity,totalprice = i.totalamount)
         orderdetailobj.save()
         i.delete()
-
-
-
-    return render(request,'payment.html',{'orderobj':orderobj})
+    
+    return render(request,'paysuccess.html')
+    
 
 
 

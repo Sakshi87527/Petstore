@@ -17,7 +17,7 @@
             </div>
           </div>
           <img src="{{i.image.url}}"
-            class="card-img-top" alt="Laptop"  style="object-fit: cover; object-position: center; width: 300px; height: 200px; margin-left: auto; margin-right: auto; "/>
+            class="round" alt="Laptop"  style="object-fit: cover; object-position: center; width: 300px; height: 200px; margin-left: auto; margin-right: auto; "/>
           <div class="card-body">
             <div class="d-flex justify-content-between">
               <p class="small"><a href="#!" class="text-muted">{{i.name}}</a></p> 
@@ -35,7 +35,7 @@
               <form method="POST" action="{% url 'atc' %}">
                 {% csrf_token %}
                 <input type="hidden" name="pid" value="{{i.id}}">
-              <button type="submit" class="text-muted mb-0">Add to Cart</button>
+              <button type="submit" class="btn-outline-primary">Add to Cart</button>
               </form>
               <div class="ms-auto text-warning">
                 <i class="fa fa-star"></i>
