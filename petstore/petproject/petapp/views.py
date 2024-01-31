@@ -1,10 +1,12 @@
 from django.shortcuts import render,redirect
 from django.views.generic import ListView,DetailView
-from .models import pet,customer,cart,order,orderdetail
+from .models import pet,customer,cart,order,orderdetail,payment
 from django.db.models import Q
 from django.http import HttpResponse
 from django.contrib.auth.hashers import make_password,check_password
 from datetime import date
+from django.core.mail import EmailMessage
+
 # Create your views here.
 class PetListView(ListView):
     model = pet
@@ -127,10 +129,22 @@ def summarypage(request):
     print(type(cartobj))
     return render(request,"summary.html",{'session':customerobj.firstname,'cartobj':cartobj,'totalbill':totalbill})
 
-def payment(request):
-    return render(request,"payment.html")
+def payments(request):
+    usersession = request.session['username']
+    customerobj = customer.objects.get(email=usersession)
+    cartobj = cart.objects.filter(customerid = customerobj.id)
+    totalbill = 0
 
-def placeolder(request):
+    for i in cartobj:
+        totalbill = i.totalamount + totalbill
+    
+    print(type(cartobj))
+
+    orderobj = order.objects.filter()
+    return render(request,"payment.html",{'session':customerobj.firstname,'cartobj':cartobj,'totalbill': totalbill})
+
+
+def placeorder(request):
     usersession = request.session['username']
     customerobj = customer.objects.get(email=usersession)
     name = request.POST.get('name') # left side name is attribute and right side variable database fetch
@@ -179,6 +193,8 @@ def paymentsuccess(request,tid,orderid):
         orderdetailobj = orderdetail(paymentid = paymentobj,ordernumber = orderid, productid = i.productid,customerid = i.customerid,quantity = i.quantity,totalprice = i.totalamount)
         orderdetailobj.save()
         i.delete()
+    send_mail = EmailMessage('hello','hello',to=['harsh30porwal@gmail.com'])
+    send_mail.send()
     
     return render(request,'paysuccess.html')
     

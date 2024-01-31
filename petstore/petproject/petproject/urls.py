@@ -33,8 +33,8 @@ urlpatterns = [
     path('viewcart/',views.viewcart,name="vc"),
     path('changequantity/',views.changequantity,name="cq"),
     path('summary/',views.summarypage,name="summary"),
-    path('payment/',views.payment,name="payment"),
-    path('placeorder/',views.placeolder,name="placeorder"),
+    path('payment/',views.payments,name="payment"),
+    path('placeorder/',views.placeorder,name="placeorder"),
     path('logout/',views.logout,name="logout"),
     path('paymentsuccess/<str:tid>/<int:orderid>/',views.paymentsuccess,name='paymentsuccess')
 ]
